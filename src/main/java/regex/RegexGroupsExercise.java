@@ -24,5 +24,17 @@ public class RegexGroupsExercise {
         catch (IOException e) {
             System.out.println(e);
         }
+
     }
+
+   /* public static void test() {
+        Pattern p = Pattern.compile("(?=.*\\d)(?=.*[A-Z])(.+){8,}");
+        Matcher m = p.matcher("hs8g$Ahn");
+        if (m.matches()) {
+            System.out.println("Valid");
+        }
+
+    }
+
+    */
 }
