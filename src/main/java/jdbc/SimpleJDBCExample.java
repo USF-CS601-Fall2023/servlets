@@ -7,10 +7,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.HashSet;
-import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
-import java.util.Set;
 import java.sql.ResultSetMetaData;
 
 /**
@@ -57,7 +54,7 @@ public class SimpleJDBCExample {
 			Properties config = loadConfig("database.properties");
 
 			// Create database URI in proper format
-			String uri = "jdbc:mysql://"+ config.getProperty("hostname") + "/" + config.getProperty("username") + "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
+			String uri = "jdbc:mysql://"+ config.getProperty("hostname") + "/" + config.getProperty("database") + "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
 			System.out.println("uri = " + uri);
 
 			PreparedStatement sql; // prepared statement
@@ -65,7 +62,6 @@ public class SimpleJDBCExample {
 				sql = dbConnection.prepareStatement("select * from students where id>? and GPA >= ?");
 				sql.setInt(1, 2);  
 				sql.setDouble(2, 3.9);
-
 
 				ResultSet results = sql.executeQuery();
 				// check the number of columns
