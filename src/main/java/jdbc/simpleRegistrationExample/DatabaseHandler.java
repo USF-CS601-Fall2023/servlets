@@ -93,7 +93,6 @@ public class DatabaseHandler {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             md.update(salted.getBytes());
-            System.out.println(md.digest());
             hashed = encodeHex(md.digest(), 64);
         }
         catch (Exception ex) {
