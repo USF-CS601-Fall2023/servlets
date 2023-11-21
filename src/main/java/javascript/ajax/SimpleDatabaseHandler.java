@@ -1,4 +1,4 @@
-package jdbc;
+package javascript.ajax;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -8,7 +8,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Properties;
-import java.sql.ResultSetMetaData;
+
 
 /**
  * The example is modified from the example by Prof. Engle.
@@ -18,7 +18,7 @@ import java.sql.ResultSetMetaData;
  * You must also have the tunnel to stargate.cs.usfca.edu running if you are
  * off-campus.
  */
-public class SimpleJDBCExample {
+public class SimpleDatabaseHandler {
 
 	/**
 	 * URI to use when connecting to database. Should be in the format:
@@ -47,43 +47,40 @@ public class SimpleJDBCExample {
 		return config;
 	}
 
-	/** Connect to the database and send a simple query. Print the results. */
-	public void connectToDatabase() {
+	/** Connect to the database and send a simple query about student. Get the result back (graduation
+	 * date and average GPA) 
+	 */
+	public String getStudentInfo(String studentName) {
+		String s = "";
+
 		try {
 
 			Properties config = loadConfig("database.properties");
 
 			// Create database URI in proper format
-			String uri = "jdbc:mysql://"+ config.getProperty("hostname") + "/" + config.getProperty("database") + "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
-			System.out.println("uri = " + uri);
-
+			String uri = String.format("jdbc:mysql://%s/%s", config.getProperty("hostname"),
+					config.getProperty("database"));
+			uri = uri + "?serverTimezone=UTC";
+			// System.out.println("uri = " + uri);
+			
 			PreparedStatement sql; // prepared statement
 			try (Connection dbConnection = DriverManager.getConnection(uri, config.getProperty("username"), config.getProperty("password"))) {
-				sql = dbConnection.prepareStatement("select * from students where id>? and GPA >= ?");
-				sql.setInt(1, 2);  
-				sql.setDouble(2, 3.9);
+				
+				sql = dbConnection.prepareStatement("select * from students where name = ?");
+				sql.setString(1, studentName);
 
-				ResultSet results = sql.executeQuery();
-				// check the number of columns
-				ResultSetMetaData rsmd = results.getMetaData();
-				int columnsNumber = rsmd.getColumnCount();
-				while (results.next()) { // go along rows using the iterator
-					// iterate along columns
-					for (int i = 0; i < columnsNumber; i++)
-					  System.out.print(results.getString(i + 1) + " ");
-					  System.out.println();
-					//System.out.println(results.getString("name"));
+				ResultSet results = sql.executeQuery();		
+				if (results.next()) { // go along rows using the iterator
+					double GPA = results.getDouble("GPA");
+                    s = s + " GPA: " + GPA;
 				}
+				
 			}
 		} catch (Exception e) {
 			System.err.println("Unable to connect properly to database.");
 			System.err.println(e.getMessage());
 		}
+		return s;
 	}
 
-
-	public static void main(String[] args) {
-		SimpleJDBCExample test = new SimpleJDBCExample();
-		test.connectToDatabase();
-	}
 }

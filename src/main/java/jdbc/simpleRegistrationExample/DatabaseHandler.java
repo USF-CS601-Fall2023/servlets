@@ -25,7 +25,7 @@ public class DatabaseHandler {
      */
     private DatabaseHandler(String propertiesFile){
         this.config = loadConfigFile(propertiesFile);
-        this.uri = "jdbc:mysql://"+ config.getProperty("hostname") + "/" + config.getProperty("username") + "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
+        this.uri = "jdbc:mysql://"+ config.getProperty("hostname") + "/" + config.getProperty("database") + "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
         //System.out.println("uri = " + uri);
     }
 
@@ -56,7 +56,7 @@ public class DatabaseHandler {
         try (Connection dbConnection = DriverManager.getConnection(uri, config.getProperty("username"), config.getProperty("password"))) {
             System.out.println("dbConnection successful");
             statement = dbConnection.createStatement();
-            statement.executeUpdate(PreparedStatements.CREATE_USER_TABLE);
+            statement.execute(PreparedStatements.CREATE_USER_TABLE);
         }
         catch (SQLException ex) {
              System.out.println(ex);
@@ -93,6 +93,7 @@ public class DatabaseHandler {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             md.update(salted.getBytes());
+            System.out.println(md.digest());
             hashed = encodeHex(md.digest(), 64);
         }
         catch (Exception ex) {
@@ -116,7 +117,7 @@ public class DatabaseHandler {
 
         String usersalt = encodeHex(saltBytes, 32); // salt
         String passhash = getHash(newpass, usersalt); // hashed password
-        System.out.println(usersalt);
+        //System.out.println(usersalt);
 
         PreparedStatement statement;
         try (Connection connection = DriverManager.getConnection(uri, config.getProperty("username"), config.getProperty("password"))) {
